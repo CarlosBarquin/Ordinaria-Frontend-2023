@@ -68,6 +68,7 @@ const pagina = () => {
 
     const [id, setId] = useState<string>("")
     const [id2, setId2] = useState<string>("")
+    const [e, sete] = useState<number>(0)
     const [isDivVisible, setDivVisible] = useState<boolean>(false);
     const [selectedEventId, setSelectedEventId] = useState<string>("")
 
@@ -130,7 +131,7 @@ const pagina = () => {
     useEffect(() =>{
       if(id2 == "") return
       updateEvent()
-   },[id2])
+   },[id2,e])
 
 
     const toggleDivVisibility = () => {
@@ -203,6 +204,7 @@ const pagina = () => {
                               <input type="number" placeholder="endtHour" onChange={(e) => { setEndHour2(parseInt(e.target.value)) }} />
                             <button onClick={() => {
                               setId2(event.id)
+                              sete(e+1)
                             }
                             }>updatear</button>
                             <div id="error-message3"></div>
