@@ -15,17 +15,18 @@ const GET_EVENTS = gql`
         date
         startHour
         endHour
+        priority
         }
   }
 `
 
 const CREATE_EVENT = gql`
-    mutation($title: String!, $description: String!, $date: Date!, $startHour: Int!, $endHour: Int!){
-        createEvent(title: $title, description: $description, date: $date, startHour: $startHour, endHour: $endHour) {
-        title
-        date
-        }
+  mutation($title: String!, $description: String!, $date: Date!, $startHour: Int!, $endHour: Int!, $priority: Int!){
+    createEvent(title: $title, description: $description, date: $date, startHour: $startHour, endHour: $endHour, priority: $priority) {
+      title
+      id
     }
+  }
 `
 
 const UPDATE_EVENT = gql`
@@ -49,6 +50,15 @@ mutation($deleteEventId: ID!){
 
 `
 
+const TOGGLE_EVENT = gql`
+  mutation($toggleEventId: ID!){
+    toggleEvent(id: $toggleEventId) {
+      title
+      priority
+    }
+  }
+`
+
 const pagina = () => {
 
     const [title, setTitle] = useState<string>("")
@@ -56,6 +66,7 @@ const pagina = () => {
     const [date, setDate] = useState<Date>()
     const [startHour, setStartHour] = useState<number>(0)
     const [endHour, setEndHour] = useState<number>(0)
+    const [priority, setPriority] = useState<number>(0);
 
 
     
@@ -68,7 +79,9 @@ const pagina = () => {
 
     const [id, setId] = useState<string>("")
     const [id2, setId2] = useState<string>("")
+    const [id3, setId3] = useState<string>("")
     const [e, sete] = useState<number>(0)
+    const [e2, sete2] = useState<number>(0)
     const [isDivVisible, setDivVisible] = useState<boolean>(false);
     const [selectedEventId, setSelectedEventId] = useState<string>("")
 
@@ -80,11 +93,12 @@ const pagina = () => {
             date : Date
             startHour : number
             endHour : number
+            priority : number
         }[];
     }>(GET_EVENTS);
 
     const [createEvent] = useMutation(CREATE_EVENT, {
-        variables : {title,description,date,startHour,endHour},
+        variables : {title,description,date,startHour,endHour, priority},
         onCompleted: () => {
           refetch();
         },
@@ -94,6 +108,17 @@ const pagina = () => {
           errorMessageElement!.textContent = errorMessage; 
         }
     });
+
+    const [toggleEvent] = useMutation(TOGGLE_EVENT, {
+      variables : {toggleEventId : id3},
+      onCompleted: () => {
+        refetch();
+      },
+      onError: (error) => {
+       alert(error)
+      }
+  });
+
 
     
     const [deleteEvent] = useMutation(DELETE_EVENT, {
@@ -133,6 +158,12 @@ const pagina = () => {
       updateEvent()
    },[id2,e])
 
+   useEffect(() =>{
+    if(id3 == "") return
+      toggleEvent()
+    },[e2])
+
+
 
     const toggleDivVisibility = () => {
       setDivVisible(!isDivVisible);
@@ -162,6 +193,7 @@ const pagina = () => {
           <input type="text" placeholder="description" onChange={(e) => {  setDescription(e.target.value) }} />
           <input type="number" placeholder="sarathour" onChange={(e) => { setStartHour(parseInt(e.target.value)) }} />
           <input type="number" placeholder="endtHour" onChange={(e) => { setEndHour(parseInt(e.target.value)) }} />
+          <input type="number" placeholder="priority" onChange={(e) => { setPriority(parseInt(e.target.value)) }} />
           <div id="error-message"></div>
           <div id="error-message2"></div>
         <button onClick={() => {
@@ -183,9 +215,7 @@ const pagina = () => {
                     {event.date.toString().substring(0,10)}--
                     {event.startHour}--
                     {event.endHour}--
-                    <button onClick={() => {
-                        setId(event.id)
-                    }}>eliminar</button>
+                    {event.priority}
                  </div>
                     { isDivVisible && selectedEventId === event.id && (<div id="formulario">
 
@@ -211,6 +241,14 @@ const pagina = () => {
 
                       </div>)
                   }
+                    <button onClick={() => {
+                        setId(event.id)
+                    }}>eliminar</button>--
+                    <button onClick={()=>{
+                        setId3(event.id)
+                        sete2(e2+1)                        
+                    }}>toggle</button>
+                    
                   <br></br>
                   <br></br>
                 </>

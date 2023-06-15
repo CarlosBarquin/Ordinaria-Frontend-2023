@@ -10,9 +10,10 @@ export const Mutation = {
       date: Date;
       startHour: number;
       endHour: number;
+      priority: number
     }
   ) => {
-    const { title, description, date, startHour, endHour } = args;
+    const { title, description, date, startHour, endHour, priority } = args;
     // check if there is a Event already in that date and time
 
     const event = await EventsCollection.findOne({
@@ -27,12 +28,17 @@ export const Mutation = {
       throw new Error("There is already an event in that date and time");
     }
 
+    if(priority < 1 || priority > 3){
+      throw new Error("Priority must be between 1 and 3");
+    }
+
     const id = await EventsCollection.insertOne({
       title,
       description,
       date: new Date(date),
       startHour,
       endHour,
+      priority
     });
 
     return {
@@ -42,6 +48,7 @@ export const Mutation = {
       date: new Date(date),
       startHour,
       endHour,
+      priority
     };
   },
 
@@ -53,7 +60,7 @@ export const Mutation = {
       description: string;
       date: Date;
       startHour: number;
-      endHour: number;
+      endHour: number
     }
   ) => {
     const { id, title, description, date, startHour, endHour } = args;
@@ -122,4 +129,36 @@ export const Mutation = {
       endHour: event.endHour,
     };
   },
+
+  toggleEvent: async (_: any, args: { id: string }) => {
+
+    // check if event exists
+    const event = await EventsCollection.findOne({
+      _id: new ObjectId(args.id),
+    });
+    // if not exists 404
+    if (!event) {
+      throw new Error("Event not found");
+    }
+    // toggle event
+    await EventsCollection.updateOne(
+      { _id: new ObjectId(args.id) },
+      {
+        $set: {
+          priority: event.priority === 1 ? 2 : 1,
+        },
+      }
+    );
+
+    return {
+      id: args.id,
+      title: event.title,
+      description: event.description,
+      date: event.date,
+      startHour: event.startHour,
+      endHour: event.endHour,
+      priority: event.priority === 1 ? 2 : 1,
+    };
+  }
+
 };

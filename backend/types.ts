@@ -5,4 +5,5 @@ export type Event = {
   date: Date;
   startHour: number;
   endHour: number;
+  priority: number;
 };

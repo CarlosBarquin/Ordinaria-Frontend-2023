@@ -8,10 +8,12 @@ export const typeDefs = `
     date: Date!
     startHour: Int!
     endHour: Int!
+    priority: Int!
   }
 
   type Query {
     events: [Event!]!
+    eventsByPriority(priority : Int!): [Event!]!
   }
 
   type Mutation {
@@ -21,6 +23,7 @@ export const typeDefs = `
       date: Date!
       startHour: Int!
       endHour: Int!
+      priority: Int!
     ): Event!
 
     updateEvent(
@@ -33,5 +36,12 @@ export const typeDefs = `
     ): Event!
 
     deleteEvent(id: ID!): Event!
+    
+    toggleEvent(id: ID!): Event!
+
+
+
+
+
   }
 `;
