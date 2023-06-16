@@ -211,7 +211,7 @@ const pagina = () => {
                       setSelectedEventId(event.id)
                  }} >
                     {<Link href={`/evento/${event.id}`}>{event.title}</Link>}--
-                    {event.description}--
+                    {<Link href={`/evento2/${event.id}`}>{event.description}</Link>}--
                     {event.date.toString().substring(0,10)}--
                     {event.startHour}--
                     {event.endHour}--

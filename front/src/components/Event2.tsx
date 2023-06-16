@@ -31,10 +31,37 @@ query($priority: Int!){
   }
 `
 
+const GET_EVENT_TITLE = gql`
+query($title: String!){
+    eventsBytitle(title: $title) {
+        id
+        title
+        description
+        date
+        startHour
+        endHour
+        priority
+    }
+  }
+`
+
+const GET_EVENT_BY = gql`
+query($title: String!, $priority: Int!){eventsByTitleAndPriority(title: $title, priority: $priority) {
+    id
+    title
+    description
+    date
+    startHour
+    endHour
+    priority
+  }}
+`
+
+
 const pagina = () => {
 
     const [priority , setPriority] = useState<number>(1)
-
+    const [title , setTitle] = useState<string>("")
   
     const { loading, error, data, refetch } = useQuery<{
         events: {
@@ -62,6 +89,35 @@ const pagina = () => {
         variables : {priority : priority}
     });
 
+    const {data: td , refetch: tr} = useQuery<{
+        eventsBytitle: {
+            id : string
+            title: string
+            description: string
+            date : Date
+            startHour : number
+            endHour : number
+            priority : number
+        }[];
+    }>(GET_EVENT_TITLE,{
+        variables : {title : title}
+    });
+
+    const {data: tdp , refetch: trp} = useQuery<{
+        eventsByTitleAndPriority: {
+            id : string
+            title: string
+            description: string
+            date : Date
+            startHour : number
+            endHour : number
+            priority : number
+        }[];
+    }>(GET_EVENT_BY,{
+        variables : {title : title, priority : priority}
+    });
+    
+
 
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
@@ -74,6 +130,7 @@ const pagina = () => {
           <>
 
             <input type="number" placeholder="priority" onChange={(e) => { setPriority(parseInt(e.target.value)) }} />
+            <input type="text" placeholder="title" onChange={(e) => { setTitle(e.target.value) }} />
 
             <button onClick={()=>{
                 setPriority(1)
@@ -113,7 +170,21 @@ const pagina = () => {
                     </li>
                 )
             })}
-       
+
+            <br></br>
+            <br></br>
+            <br></br>
+
+           {tdp?.eventsByTitleAndPriority.map((event)=>{
+                return(
+                    <li>
+                        {event.title}
+                        {event.priority}
+                        {event.description}
+                    </li>
+                )
+            })
+           }
   
           
         

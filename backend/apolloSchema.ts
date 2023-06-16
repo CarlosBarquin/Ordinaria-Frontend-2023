@@ -14,6 +14,12 @@ export const typeDefs = `
   type Query {
     events: [Event!]!
     eventsByPriority(priority : Int!): [Event!]!
+    eventsBytitle(title : String!): [Event!]!
+    eventsByTitleAndPriority(title : String!, priority : Int!): [Event!]!
+    eventsByDate(date : Date!): [Event!]!
+    event (id : ID!): Event!
+
+
   }
 
   type Mutation {
