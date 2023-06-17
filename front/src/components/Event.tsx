@@ -2,6 +2,7 @@ import { gql, useMutation, useQuery} from "@apollo/client";
 import { dirname } from "node:path/win32";
 import { disconnect, eventNames } from "process";
 import { use, useEffect, useState } from "react";
+import styled from "styled-components";
 import { ObjectId } from 'mongodb';
 import Link from "next/link";
 
@@ -85,6 +86,9 @@ const pagina = () => {
     const [isDivVisible, setDivVisible] = useState<boolean>(false);
     const [selectedEventId, setSelectedEventId] = useState<string>("")
 
+    const[max, setMax] = useState<number>(6)
+    const[min, setMin] = useState<number>(0)
+    const[page, setPage] = useState<number>(1)
     const { loading, error, data, refetch } = useQuery<{
         events: {
             id : string
@@ -179,7 +183,7 @@ const pagina = () => {
     
       return (
           <>   
-          <h1>Crear</h1>
+          <Titulo>Crear</Titulo>
           <input type="datetime-local" placeholder="date" onChange={(e) => {
             
             const date = new Date(e.target.value)
@@ -194,30 +198,77 @@ const pagina = () => {
           <input type="number" placeholder="sarathour" onChange={(e) => { setStartHour(parseInt(e.target.value)) }} />
           <input type="number" placeholder="endtHour" onChange={(e) => { setEndHour(parseInt(e.target.value)) }} />
           <input type="number" placeholder="priority" onChange={(e) => { setPriority(parseInt(e.target.value)) }} />
-          <div id="error-message"></div>
-          <div id="error-message2"></div>
-        <button onClick={() => {
+        <Button onClick={() => {
             createEvent();
         }
-        }>crear</button>
+        }>crear</Button>
+        
+          <div id="error-message"></div>
+          <div id="error-message2"></div>
+          <div id="error-message3"></div>
+          <Titulo>Eventos de ahora en adelante. Pag: {page}</Titulo>
 
-          <h2>Eventos de ahora en adelante</h2>
-          {data?.events.map((event) => {
+          <Formulario>
+        <Button onClick={()=>{
+          if(max >= (data!.events.length)-1) return
+           setMin(min+7)
+           setMax(max+7)
+           setPage(page+1)
+        }}>siguiente</Button>
+        <Button onClick={()=>{
+          if(min === 0) return
+          setMin(min-7)
+          setMax(max-7)
+          setPage(page-1)
+        }}>anterior</Button>
+          <Celda></Celda>
+          <Celda></Celda>
+          <Celda></Celda>
+          <Celda></Celda>
+          <Celda></Celda>
+          <Celda></Celda>
+          <Celda></Celda>
 
+          <Header>titulo</Header>
+          <Header>description</Header>
+          <Header>fecha</Header>
+          <Header>starthour</Header>
+          <Header>endHour</Header>
+          <Header>priority</Header> 
+          <Header></Header> 
+          <Header></Header> 
+          <Header></Header>     
+           {data?.events.map((event, index) => {
+
+
+              if( index >= min && index <= max ) {  
             return (
                 <>
-                 <div key={event.id} onClick={()=>{
-                      toggleDivVisibility()
-                      setSelectedEventId(event.id)
-                 }} >
-                    {<Link href={`/evento/${event.id}`}>{event.title}</Link>}--
-                    {<Link href={`/evento2/${event.id}`}>{event.description}</Link>}--
-                    {event.date.toString().substring(0,10)}--
-                    {event.startHour}--
-                    {event.endHour}--
-                    {event.priority}
-                 </div>
-                    { isDivVisible && selectedEventId === event.id && (<div id="formulario">
+                     <Celda>{<Link href={`/evento/${event.id}`}>{event.title}</Link>}</Celda>
+                     <Celda> {<Link href={`/evento2/${event.id}`}>{event.description}</Link>}</Celda>
+                     <Celda>{event.date.toString().substring(0,10)}</Celda>
+                     <Celda>{event.startHour}</Celda>
+                     <Celda>{event.endHour}</Celda>
+                     <Celda>{event.priority}</Celda>
+                     <Celda>
+                     <Button2 onClick={() => {
+                        setId(event.id)
+                    }}>delete</Button2>
+                     </Celda>
+                     <Celda>
+                     <Button2 onClick={()=>{
+                        setId3(event.id)
+                        sete2(e2+1)                        
+                    }}>toggle</Button2>
+                     </Celda>
+                     <Celda>
+                    <Button2 onClick={()=>{
+                        toggleDivVisibility()
+                        setSelectedEventId(event.id)                 
+                    }}>update</Button2>
+                     </Celda>
+                     
+                    { isDivVisible && selectedEventId === event.id && (<>
 
                       <input type="datetime-local" placeholder="date" onChange={(e) => {
                                 
@@ -232,32 +283,103 @@ const pagina = () => {
                               <input type="text" placeholder="description" onChange={(e) => {  setDescription2(e.target.value) }} />
                               <input type="number" placeholder="sarathour" onChange={(e) => { setStartHour2(parseInt(e.target.value)) }} />
                               <input type="number" placeholder="endtHour" onChange={(e) => { setEndHour2(parseInt(e.target.value)) }} />
-                            <button onClick={() => {
+                            <Button onClick={() => {
                               setId2(event.id)
                               sete(e+1)
                             }
-                            }>updatear</button>
-                            <div id="error-message3"></div>
+                            }>updatear</Button>
+                            <Celda></Celda>
+                            <Celda></Celda>
+                            <Celda></Celda>
+                          
 
-                      </div>)
+                      </>)
                   }
-                    <button onClick={() => {
-                        setId(event.id)
-                    }}>eliminar</button>--
-                    <button onClick={()=>{
-                        setId3(event.id)
-                        sete2(e2+1)                        
-                    }}>toggle</button>
+                  
+
                     
-                  <br></br>
-                  <br></br>
+                    
+            
                 </>
             )
+                  }
           })}
-        
+          </Formulario>
           
           </>
       )
   }
   
   export default pagina;
+
+
+  
+
+const Formulario = styled.div`
+border: 1px solid #ccc;
+display: grid;
+grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 0.3fr;
+grid-gap: 1px;
+background-color: #fff;
+color: #444;
+margin-bottom: 50px;
+`;
+
+const Header = styled.div`
+background-color: #f1f1f1;
+font-weight: bold;
+padding: 20px;
+text-align: left;
+`;
+
+const Celda = styled.div`
+padding: 10px 20px 10px 20px;
+text-align: left;
+border-bottom: 1px solid #ddd;
+`;
+
+const Titulo = styled.div`
+background-color: blue;
+font-weight: bold;
+padding: 20px;
+text-align: left;
+color: white;
+`;
+
+const Button = styled.button`
+background-color: white;
+color: black;
+border: 2px solid blue;
+padding: 16px 32px;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+font-size: 16px;
+margin: 4px 2px;
+transition-duration: 0.4s;
+cursor: pointer;
+
+&:hover {
+  background-color: blue;
+  color: white;
+}
+`;
+
+const Button2 = styled.button`
+background-color: white;
+color: black;
+border: 2px solid red;
+padding: 16px 32px;
+text-align: center;
+text-decoration: none;
+display: inline-block;
+font-size: 16px;
+margin: 4px 2px;
+transition-duration: 0.4s;
+cursor: pointer;
+
+&:hover {
+  background-color: red;
+  color: white;
+}
+`;

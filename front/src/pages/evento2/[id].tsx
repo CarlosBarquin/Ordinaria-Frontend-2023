@@ -3,6 +3,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import Link from "next/link";
 import { GetStaticPaths, GetStaticProps, NextPage } from "next";
 import { getSSRClient } from "@/libs/client";
+import styled from "styled-components";
 
 type data = {
 
@@ -118,3 +119,11 @@ const Index: NextPage<{ data: data }> = ({ data }) => {
 }
 
 export default Index;
+
+const Titulo = styled.div`
+background-color: blue;
+font-weight: bold;
+padding: 20px;
+text-align: left;
+color: white;
+`;
